@@ -5,14 +5,18 @@
 
 typedef long long int ll;
 time_t startTime;
+ll studentsOver;
 
 
 pthread_t courseThreadArr[10000];   // array of threads for each course
 pthread_t studThreadArr[10000];     // array of threads for each student
 pthread_mutex_t course_TA_Allocation_lock;           // mutex lock
 pthread_mutex_t student_CourseApplication_lock;           // mutex lock
-pthread_mutex_t mutex_lock;
-pthread_cond_t c;
+pthread_mutex_t mutex_lock[100];
+pthread_cond_t c[100];
+
+pthread_mutex_t mutex_lock2[100];
+pthread_cond_t c2[100];
 
 int turns[100];
 struct Student
@@ -30,13 +34,16 @@ struct Course
     char courseName[50];
     float interestQ;
     ll course_max_slots;
-    ll D;                  // no of slots announced for current tutorial
     ll p;                  // number of labs from which the course accepts TAs
     ll listp[100];         // list of lab IDs
+
+    ll D;                  // no of slots announced for current tutorial
     ll currentStudentSize; // no of students allocated for current tutorial of course
-    char courseTA[100];    // TA name for current tutorial of course
+
     ll isOn;               // if Course tutorial is On/Off
     ll isExisting;         // if Course is in simulation or not
+
+    char courseTA[100];    // TA name for current tutorial of course
     ll labID_Allocated;
     ll TA_Allocated;        // TA id allocated for curr Tut
 };
