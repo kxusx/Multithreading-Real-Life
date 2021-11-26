@@ -22,12 +22,14 @@ void input()
         CourseList[i].isOn = 0;
         CourseList[i].isExisting = 1;
         CourseList[i].TA_Allocated = -1;
+        CourseList[i].isStarting=0;
     }
 
     // taking in StudentList
     for (int i = 0; i < num_student; i++)
     {
         scanf("%f %lld %lld %lld %f", &StudentList[i].calibre, &StudentList[i].courseIDs[0], &StudentList[i].courseIDs[1], &StudentList[i].courseIDs[2], &StudentList[i].time);
+        courseInterest[StudentList[i].courseIDs[0]]++;
         StudentList[i].isLearning = 0;
         StudentList[i].prefPos = 0;
         StudentList[i].existing = 1;
@@ -70,9 +72,11 @@ void print()
 
 int main()
 {
-    pthread_mutex_init(&course_TA_Allocation_lock, NULL);
-    pthread_mutex_init(&student_CourseApplication_lock, NULL);
+    // pthread_mutex_init(&course_TA_Allocation_lock, NULL);
+    // pthread_mutex_init(&student_CourseApplication_lock, NULL);
     studentsOver=0;
+    coursesOver =0;
+    memset(courseInterest, 0, sizeof(courseInterest));
     srand(time(0));
     input();
     printf("\n");
@@ -81,7 +85,7 @@ int main()
 
     // Creating threads
     for (int l = 0;  l < num_student; l++)
-    {
+    { 
         pthread_t curr_tid;
         struct thread_details *thread_input = (struct thread_details *)(malloc(sizeof(struct thread_details)));
         thread_input->id = l;
@@ -91,7 +95,7 @@ int main()
 
     for (int l = 0; l < num_courses; l++)
     {
-    pthread_t curr_tid;
+     pthread_t curr_tid;
     struct thread_details *thread_input = (struct thread_details *)(malloc(sizeof(struct thread_details)));
     thread_input->id = l;
     pthread_create(&curr_tid, NULL, courseStimulater, (void *)(thread_input));
@@ -102,7 +106,7 @@ int main()
 // -------------------- -------------------- -------------------- -------------------- -------------------- -------------------- --------------------
     for (int l = 0; l < num_courses; l++)
     {
-        pthread_join(courseThreadArr[i], NULL);
+        pthread_join(courseThreadArr[l], NULL);
     }
     for (int l = 0; l < num_student; l++)
     {

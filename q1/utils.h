@@ -6,12 +6,18 @@
 typedef long long int ll;
 time_t startTime;
 ll studentsOver;
+ll coursesOver;
+
+ll courseInterest[100];
 
 
 pthread_t courseThreadArr[10000];   // array of threads for each course
 pthread_t studThreadArr[10000];     // array of threads for each student
-pthread_mutex_t course_TA_Allocation_lock;           // mutex lock
-pthread_mutex_t student_CourseApplication_lock;           // mutex lock
+
+pthread_mutex_t course_TA_Allocation_lock[100];           // mutex lock
+pthread_mutex_t lab_lock[100];  
+pthread_mutex_t student_CourseApplication_lock[100];           // mutex lock
+
 pthread_mutex_t mutex_lock[100];
 pthread_cond_t c[100];
 
@@ -41,6 +47,7 @@ struct Course
     ll currentStudentSize; // no of students allocated for current tutorial of course
 
     ll isOn;               // if Course tutorial is On/Off
+    ll isStarting;
     ll isExisting;         // if Course is in simulation or not
 
     char courseTA[100];    // TA name for current tutorial of course
@@ -67,3 +74,12 @@ struct thread_details
 {
     int id;
 };
+
+#define RED     "\x1b[31m"
+#define GREEN   "\x1b[32m"
+#define YELLOW  "\x1b[33m"
+#define BLUE    "\x1b[34m"
+#define MAGENTA "\x1b[35m"
+#define CYAN    "\x1b[36m"
+
+#define RESET   "\x1b[0m"
