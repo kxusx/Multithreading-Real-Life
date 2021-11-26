@@ -1,5 +1,6 @@
 // g++ -std=c++11 client.cpp
 #include "clientUtils.h"
+#include "serverUtils.h"
 
 pair<string, int> read_string_from_socket(int fd, int bytes)
 {

@@ -36,7 +36,7 @@ pthread_mutex_t clientLock = PTHREAD_MUTEX_INITIALIZER;
 
 
 const ll MOD = 1000000007;
-#define SERVER_PORT 8007
+
 
 #define part cout << "-----------------------------------" << endl;
 #define pb push_back

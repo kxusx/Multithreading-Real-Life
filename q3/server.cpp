@@ -34,11 +34,12 @@ int send_string_on_socket(int fd, const string &s)
     return bytes_sent;
 }
 
-void adder(string cmd, int client_socket_fd)
+void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
 {
     vector<string> token_commands;
     stringstream check1(cmd);
     string intermediate, ack;
+    string st = boost::lexical_cast<string>(pthreadID);
 
     while (getline(check1, intermediate, ' '))
     {
@@ -57,13 +58,13 @@ void adder(string cmd, int client_socket_fd)
             pthread_mutex_lock(&mutex_lock[index]);
             keys[index] = token_commands[2];
             pthread_mutex_unlock(&mutex_lock[index]);
-            ack = "Insertion Successful";
+            ack = st + ":Insertion Successful";
             send_string_on_socket(client_socket_fd, ack);
             flag = 1;
         } else 
         {
             //printf("Key already exists\n");
-            ack = "Key already exists";
+            ack = st + ":Key already exists";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -76,13 +77,13 @@ void adder(string cmd, int client_socket_fd)
             keys[index] = "0";
             pthread_mutex_unlock(&mutex_lock[index]);
             //printf("Deletion Successful\n");
-            ack = "Deletion Successful";
+            ack = st + ":Deletion Successful";
             send_string_on_socket(client_socket_fd, ack);
         }
         else
         {
             //printf("Deletion Successful\n");
-            ack = "No such key exists";
+            ack = st + ":No such key exists";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -93,13 +94,14 @@ void adder(string cmd, int client_socket_fd)
         {
             pthread_mutex_lock(&mutex_lock[index]);
             keys[index] = token_commands[2];
+            string p = st + ":"+keys[index];
             pthread_mutex_unlock(&mutex_lock[index]);
-            send_string_on_socket(client_socket_fd, token_commands[2]);
+            send_string_on_socket(client_socket_fd, p);
         }
         else
         {
             //printf("Key doesn't exist\n");
-            ack = "Key doesn't exist";
+            ack = st + ":Key doesn't exist";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -120,13 +122,13 @@ void adder(string cmd, int client_socket_fd)
             pthread_mutex_lock(&mutex_lock[index2]);
             keys[index2] = s2s1;
             pthread_mutex_unlock(&mutex_lock[index2]);
-
+            s2s1 = st+":"+s2s1;
             send_string_on_socket(client_socket_fd, s2s1);
         }
         else
         {
             //printf("Concat failed as at least one of the keys does not exist\n");
-            ack = "Concat failed as at least one of the keys does not exist";
+            ack = st + ":Concat failed as at least one of the keys does not exist";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -136,13 +138,14 @@ void adder(string cmd, int client_socket_fd)
         if (keys[index] == "0")
         {
             pthread_mutex_lock(&mutex_lock[index]);
-            send_string_on_socket(client_socket_fd, keys[index]);
+            string p = st + ":"+keys[index];
+            send_string_on_socket(client_socket_fd, p);
             pthread_mutex_unlock(&mutex_lock[index]);
         }
         else
         {
             //printf("Key doesn't exist\n");
-            ack = "Key doesn't exist";
+            ack = st+ ":Key doesn't exist";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -150,7 +153,7 @@ void adder(string cmd, int client_socket_fd)
 
 //------------------------------------------------------------------------------------------------------------------------
 
-void handle_connection(int client_socket_fd)
+void handle_connection(int client_socket_fd,pthread_t pthreadID)
 {
     int received_num, sent_num;
     int ret_val = 1;
@@ -166,7 +169,7 @@ void handle_connection(int client_socket_fd)
         //goto close_client_socket_ceremony;
     }
 
-    adder(cmd, client_socket_fd);
+    adder(cmd, client_socket_fd,pthreadID);
 
 close_client_socket_ceremony:
     close(client_socket_fd);
@@ -194,7 +197,8 @@ void *serverThread_routine(void *arg)
             P_clientSocketfd = clientListQueue.front();
             clientListQueue.pop();
             int clientSocketfd = *P_clientSocketfd;
-            handle_connection(clientSocketfd);
+            pthread_t pthreadID= pthread_self();
+            handle_connection(clientSocketfd,pthreadID);
         }
     }
     return NULL;

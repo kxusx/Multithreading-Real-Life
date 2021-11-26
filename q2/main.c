@@ -9,8 +9,8 @@ void input(){
     scanf("%lld",&X);
     scanf("%lld",&num_groups);
     for(i = 0; i < num_groups ; i++){
-        scanf("%lld",&groups[i].k);
-        for(j = 0; j < groups[i].k; j++){
+        scanf("%lld",&groups[i].size);
+        for(j = 0; j < groups[i].size; j++){
             scanf("%s %c %lld %lld %lld",groups[i].names[j],&groups[i].support[j],&groups[i].time_reached[j],&groups[i].patience[j],groups[i].enragedScore[j]);
         }
     }
@@ -23,5 +23,5 @@ void input(){
 
 int main(){
     input();
-    
+
 }

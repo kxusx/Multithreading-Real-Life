@@ -20,6 +20,8 @@
 #include <string.h>
 #include <iostream>
 #include <vector>
+#include <string> 
+#include <boost/lexical_cast.hpp>
 #include <sstream>
 using namespace std;
 
@@ -38,7 +40,7 @@ typedef long long ll;
 #define part cout << "-----------------------------------" << endl;
 
 #define MAX_CLIENTS 4
-#define SERVER_PORT 8007
+#define SERVER_PORT 8005
 
 const int initial_msg_len = 256;
 

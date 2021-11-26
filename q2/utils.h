@@ -11,7 +11,7 @@ ll num_groups;
 ll G;
 
 struct Group{
-    ll k;   // no of ppl in grp
+    ll size;   // no of ppl in grp
     char names[100][100];
     char support[100];
     ll time_reached[100];
