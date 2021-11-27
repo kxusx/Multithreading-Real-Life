@@ -66,25 +66,6 @@ int get_socket_fd()
     return socket_fd;
 }
 
-// void begin_process()
-// {
-//     struct sockaddr_in server_obj;
-//     int socket_fd = get_socket_fd(&server_obj);
-//     cout << "Connection to server successful" << endl;
-//     while (true)
-//     {
-//         string to_send;
-//         cout << "Enter msg: ";
-//         getline(cin, to_send);
-//         send_string_on_socket(socket_fd, to_send);
-//         int num_bytes_read;
-//         string output_msg;
-//         tie(output_msg, num_bytes_read) = read_string_from_socket(socket_fd, buff_sz);
-//         cout << "Received: " << output_msg << endl;
-//         cout << "====" << endl;
-//     }
-// }
-
 void *client_Thread_Routine(void *arg)
 {
     int id = ((struct thread_details *)arg)->id;

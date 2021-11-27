@@ -40,7 +40,7 @@ typedef long long ll;
 #define part cout << "-----------------------------------" << endl;
 
 #define MAX_CLIENTS 4
-#define SERVER_PORT 8005
+#define SERVER_PORT 8008
 
 const int initial_msg_len = 256;
 

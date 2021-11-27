@@ -25,7 +25,8 @@ pair<string, int> read_string_from_socket(const int &fd, int bytes)
 int send_string_on_socket(int fd, const string &s)
 {
     // debug(s.length());
-    printf("sending\n");
+    //printf("sending\n");
+    //cout<<s;
     int bytes_sent = write(fd, s.c_str(), s.length());
     if (bytes_sent < 0)
     {
@@ -47,7 +48,7 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
     }
 
     ll index = stoi(token_commands[1]), flag = 0, index2;
-    cout << token_commands[0] << "\n";
+    //cout << token_commands[0] << "\n";
 
     if (token_commands[0] == "insert")
     {
@@ -59,12 +60,14 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
             keys[index] = token_commands[2];
             pthread_mutex_unlock(&mutex_lock[index]);
             ack = st + ":Insertion Successful";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
             flag = 1;
         } else 
         {
             //printf("Key already exists\n");
             ack = st + ":Key already exists";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -76,14 +79,15 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
             pthread_mutex_lock(&mutex_lock[index]);
             keys[index] = "0";
             pthread_mutex_unlock(&mutex_lock[index]);
-            //printf("Deletion Successful\n");
             ack = st + ":Deletion Successful";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
         else
         {
-            //printf("Deletion Successful\n");
+            keys[index] = "0";
             ack = st + ":No such key exists";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -95,6 +99,7 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
             pthread_mutex_lock(&mutex_lock[index]);
             keys[index] = token_commands[2];
             string p = st + ":"+keys[index];
+            cout<<p<<"\n";
             pthread_mutex_unlock(&mutex_lock[index]);
             send_string_on_socket(client_socket_fd, p);
         }
@@ -102,6 +107,7 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
         {
             //printf("Key doesn't exist\n");
             ack = st + ":Key doesn't exist";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -123,22 +129,25 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
             keys[index2] = s2s1;
             pthread_mutex_unlock(&mutex_lock[index2]);
             s2s1 = st+":"+s2s1;
+            cout<<s2s1<<"\n";
             send_string_on_socket(client_socket_fd, s2s1);
         }
         else
         {
             //printf("Concat failed as at least one of the keys does not exist\n");
             ack = st + ":Concat failed as at least one of the keys does not exist";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
 
     if (token_commands[0] == "fetch")
     {
-        if (keys[index] == "0")
+        if (keys[index] != "0")
         {
             pthread_mutex_lock(&mutex_lock[index]);
             string p = st + ":"+keys[index];
+            cout<<p<<"\n";
             send_string_on_socket(client_socket_fd, p);
             pthread_mutex_unlock(&mutex_lock[index]);
         }
@@ -146,6 +155,7 @@ void adder(string cmd, int client_socket_fd,pthread_t pthreadID)
         {
             //printf("Key doesn't exist\n");
             ack = st+ ":Key doesn't exist";
+            cout<<ack<<"\n";
             send_string_on_socket(client_socket_fd, ack);
         }
     }
@@ -173,7 +183,7 @@ void handle_connection(int client_socket_fd,pthread_t pthreadID)
 
 close_client_socket_ceremony:
     close(client_socket_fd);
-    printf(RED "Disconnected from client" RESET "\n");
+    //printf(RED "Disconnected from client" RESET "\n");
     return;
 }
 
@@ -272,7 +282,7 @@ int main(int argc, char *argv[])
     while (1)
     {
         /* accept a new request, create a client_socket_fd */
-        printf("Waiting for a new client to request for a connection\n");
+        //printf("Waiting for a new client to request for a connection\n");
         client_socket_fd = accept(wel_socket_fd, (struct sockaddr *)&client_addr_obj, &clilen);
         if (client_socket_fd < 0)
         {
@@ -280,7 +290,7 @@ int main(int argc, char *argv[])
             exit(-1);
         }
 
-        printf(GREEN "New client connected from port number %d and IP %s \n" RESET, ntohs(client_addr_obj.sin_port), inet_ntoa(client_addr_obj.sin_addr));
+        //printf(GREEN "New client connected from port number %d and IP %s \n" RESET, ntohs(client_addr_obj.sin_port), inet_ntoa(client_addr_obj.sin_addr));
 
         int *P_clientSocketfd = (int *)malloc(sizeof(int));
         *P_clientSocketfd = client_socket_fd;
@@ -290,11 +300,11 @@ int main(int argc, char *argv[])
         pthread_cond_signal(&c);
         pthread_mutex_unlock(&clientList_Lock);
         counter++;
-        printf("counter:%d m:%lld\n", counter,m);
+        //printf("counter:%d m:%lld\n", counter,m);
     }
 
     //----------------------------------------------------------------------
-    cout << "bye\n";
+    //cout << "bye\n";
     for (int i = 0; i < noOfWorkerThreads; i++)
     {
         pthread_join(serverThread[i], NULL);
