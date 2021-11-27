@@ -112,7 +112,7 @@ void course_TA_Allocation(ll id)
                         CourseList[id].TA_Allocated = j;
                         //printf("J : %lld",j);
                         position_giver(LabList[labID].courseDone[j]);
-                        printf(YELLOW"TA %lld from lab %s has been allocated to course %s for his %s TA ship\n"RESET, j, LabList[labID].labName, CourseList[id].courseName, position);
+                        printf(CYAN"TA %lld from lab %s has been allocated to course %s for his %s TA ship\n"RESET, j, LabList[labID].labName, CourseList[id].courseName, position);
                     }
                 }
             }
@@ -152,7 +152,7 @@ void tut_over(ll id)
     pthread_mutex_lock(&mutex_lock[id]);
     char labName[100];
     strcpy(labName, LabList[CourseList[id].labID_Allocated].labName);
-    printf(MAGENTA"TA %lld from lab %s has completed the tutorial for course %s\n"RESET, CourseList[id].TA_Allocated, labName, CourseList[id].courseName);
+    printf(RED"TA %lld from lab %s has completed the tutorial for course %s \n"RESET, CourseList[id].TA_Allocated, labName, CourseList[id].courseName);
     LabList[CourseList[id].labID_Allocated].busy[CourseList[id].TA_Allocated] = 0;
     CourseList[id].isOn = 0;
     CourseList[id].TA_Allocated = -1;

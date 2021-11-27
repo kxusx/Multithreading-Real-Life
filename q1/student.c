@@ -6,21 +6,26 @@ void *StudentStimulater(void *arg)
 {
     int id = ((struct thread_details *)arg)->id;
     int time = StudentList[id].time;
-    sleep(time);
     student_PreferenceFilling(id); // filling preferences at alloted time
     while (1)
     {   
         sleep(2);
         student_CourseApplication(id); // applying for each course per preference   (locks used here)
         sleep(3);
+        
+        //printf("id:%d l:%lld\n",id,StudentList[id].existing);
+        if(StudentList[id].existing==0){
+            break;
+        }
+
         student_CourseSelection(id); // selecting course based on prob
+
         if (student_Removed(id)){
-            //printf("STUD %d 1REMOVED : %lld\n",id,studentsOver);
             break;
         }     
-        if(coursesOver == num_courses){
-            break;
-        } 
+        // if(coursesOver == num_courses){
+        //     break;
+        // } 
     }
     return NULL;
 }
@@ -36,6 +41,13 @@ int student_Removed(ll id)
 
 void student_PreferenceFilling(ll id)
 {
+    int time = StudentList[id].time;
+    pthread_mutex_lock(&time_lock[time]);
+    while (timer != time)
+    {
+            pthread_cond_wait(&timeC[time], &time_lock[time]);
+    }
+    pthread_mutex_lock(&time_lock[time]);
     StudentList[id].existing = 1; // student has filled preferences, and hence it is in simulation
     printf(YELLOW"Student %lld has filled in preferences for course registration\n"RESET, id);
 }
@@ -58,7 +70,7 @@ L2:
             {
                 CourseList[courseWantedID].currentStudentSize++;
                 StudentList[id].isLearning = 1;
-                printf(MAGENTA"mStudent %lld has been allocated a seat in course %s\n"RESET, id, CourseList[courseWantedID].courseName);
+                printf(MAGENTA"Student %lld has been allocated a seat in course %s\n"RESET, id, CourseList[courseWantedID].courseName);
             }
             pthread_mutex_unlock(&student_CourseApplication_lock[courseWantedID]);
         }
@@ -91,7 +103,7 @@ L2:
                     {
                         CourseList[courseWantedID].currentStudentSize++;
                         StudentList[id].isLearning = 1;
-                        printf(MAGENTA"cStudent %lld has been allocated a seat in course %s\n"RESET, id, CourseList[courseWantedID].courseName);
+                        printf(MAGENTA"Student %lld has been allocated a seat in course %s\n"RESET, id, CourseList[courseWantedID].courseName);
                     }
                     pthread_mutex_unlock(&student_CourseApplication_lock[courseWantedID]);
                 }
@@ -112,7 +124,7 @@ L2:
         }
         else
         {
-            printf(CYAN"Student %lld has changed current preference from %s (priority %lld) to %s (priority %lld)\n"RESET, id, CourseList[courseWantedID].courseName, pos, CourseList[nextCourseWantedID].courseName, pos + 1);
+            printf(YELLOW"Student %lld has changed current preference from %s (priority %lld) to %s (priority %lld)\n"RESET, id, CourseList[courseWantedID].courseName, pos, CourseList[nextCourseWantedID].courseName, pos + 1);
             StudentList[id].prefPos++;
             courseInterest[courseWantedID]--;
             courseInterest[nextCourseWantedID]++;
@@ -154,9 +166,11 @@ void student_CourseSelection(ll id) // after Tut is over, the student selects co
     ll pos = StudentList[id].prefPos;
     //printf("StudID : %lld prefPos : %lld CourseWanted Id : %lld next : %lld \n", id, pos, courseWantedID, nextCourseWantedID);
     prob = StudentList[id].calibre * CourseList[courseWantedID].interestQ;
+    prob = prob * 100;
+    float p1 = (rand() % 100);
     //printf("prob :%f id : %lld\n", prob, id);
 
-    if (prob > 0.5) // to check if interest is enuf
+    if (p1<prob) // to check if interest is enuf
     {
         studentsOver++;
         StudentList[id].existing = 0; // student is out of simulation since he has selected his prefered course
@@ -176,7 +190,7 @@ void student_CourseSelection(ll id) // after Tut is over, the student selects co
             else
             {
 
-                printf(CYAN"Student %lld has changed current preference from %s (priority %lld) to %s (priority %lld)\n"RESET, id, CourseList[courseWantedID].courseName, pos, CourseList[nextCourseWantedID].courseName, pos + 1);
+                printf(YELLOW"Student %lld has changed current preference from %s (priority %lld) to %s (priority %lld)\n"RESET, id, CourseList[courseWantedID].courseName, pos, CourseList[nextCourseWantedID].courseName, pos + 1);
                 StudentList[id].prefPos++;
                 courseInterest[courseWantedID]--;
                 courseInterest[nextCourseWantedID]++;

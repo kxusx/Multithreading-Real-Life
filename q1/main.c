@@ -70,6 +70,19 @@ void print()
     }
 }
 
+void *sleepingFunc(void *arg)
+{
+    timer = 0;
+    while (1)
+    {
+        pthread_mutex_lock(&time_lock[timer + 1]);
+        sleep(1);
+        timer++;
+        pthread_cond_broadcast(&timeC[timer]);
+        pthread_mutex_lock(&time_lock[timer + 1]);
+    }
+}
+
 int main()
 {
     // pthread_mutex_init(&course_TA_Allocation_lock, NULL);
@@ -80,6 +93,8 @@ int main()
     srand(time(0));
     input();
     printf("\n");
+
+    pthread_create(&sleeper, NULL, sleepingFunc, NULL);
     
 // -------------------- -------------------- -------------------- -------------------- -------------------- -------------------- --------------------
 

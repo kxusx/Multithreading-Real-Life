@@ -7,6 +7,7 @@ typedef long long int ll;
 time_t startTime;
 ll studentsOver;
 ll coursesOver;
+ll timer;
 
 ll courseInterest[100];
 
@@ -17,6 +18,11 @@ pthread_t studThreadArr[10000];     // array of threads for each student
 pthread_mutex_t course_TA_Allocation_lock[100];           // mutex lock
 pthread_mutex_t lab_lock[100];  
 pthread_mutex_t student_CourseApplication_lock[100];           // mutex lock
+
+pthread_t sleeper;
+
+pthread_mutex_t time_lock[1000];
+pthread_cond_t timeC[1000];
 
 pthread_mutex_t mutex_lock[100];
 pthread_cond_t c[100];
@@ -29,7 +35,7 @@ struct Student
 {
     float calibre;
     ll courseIDs[3];
-    float time;
+    float time; 
     ll isLearning;                  // if students is allocated for tutorial already or not
     ll prefPos;                     // preferencePosition
     ll existing;                    // to check if student is in simulation or not
