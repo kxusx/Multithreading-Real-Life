@@ -1,2 +1,2 @@
 main:
-	gcc -g main.c 
+	gcc -g main.c person.c
