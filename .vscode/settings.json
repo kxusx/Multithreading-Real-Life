@@ -1,5 +1,13 @@
 {
     "files.associations": {
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "regex": "c",
+        "array": "c",
+        "any": "c",
+        "string_view": "c",
+        "ranges": "c",
+        "span": "c",
+        "type_traits": "c",
+        "shared_mutex": "cpp"
     }
 }
