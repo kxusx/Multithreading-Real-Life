@@ -21,7 +21,7 @@ void position_giver(ll id)
     if (pos >= 4)
     {   
         char str[100], random[100];
-        strcpy(random, "the");
+        strcpy(random, "th");
         sprintf(str, "%lld", pos);
         strcat(str, random);
         strcpy(goals[id].position, str);
