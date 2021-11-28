@@ -1,6 +1,6 @@
 #include "person.h"
 #include "utils.h"
- 
+
 void *personStimulater(void *arg)
 {
     int id = ((struct thread_details *)arg)->id;
@@ -9,7 +9,8 @@ void *personStimulater(void *arg)
 
     stadium_reached(id, wantedZone);
     gettingSeat(id, wantedZone);
-    if(persons[id].gotSeated==2){
+    if (persons[id].gotSeated == 2)
+    {
         //printf("exiting\n");
         return NULL;
     }
@@ -17,13 +18,13 @@ void *personStimulater(void *arg)
     //printf("EXITING FOR ID:%d WANTED:%d\n",id,wantedZone);
     return NULL;
 }
- 
+
 void stadium_reached(int id, int wantedZone)
 {
     //printf("id:%d wantedZone:%d support:%c\n", id,wantedZone, persons[id].c_support);
 
     pthread_mutex_lock(&person_lock[id]);
-    pthread_mutex_lock(&time_lock[persons[id].time_reached]); 
+    pthread_mutex_lock(&time_lock[persons[id].time_reached]);
     //printf("id:%d wantedZone:%d sr:%lld\n",id,wantedZone,persons[id].stadiumReached);
     if (persons[id].stadiumReached == 0)
     {
@@ -41,7 +42,6 @@ void stadium_reached(int id, int wantedZone)
 
 void gettingSeat(int id, int wantedZone)
 {
-
     if (wantedZone == 0)
     {
         //printf("0 id : %d wanted zone :%d \n",id,wantedZone);
@@ -147,20 +147,30 @@ void exiting(int id, int wantedZone)
     {
         while (1)
         {
+            int CTIME = timer + 1;
+
+            pthread_mutex_lock(&time_lock[CTIME]);
+            //printf("id:%d wantedZone:%d sr:%lld\n",id,wantedZone,persons[id].stadiumReached);
+            while (timer != CTIME)
+            {
+                pthread_cond_wait(&timeC[CTIME], &time_lock[CTIME]);
+            }
+
             if (timer >= persons[id].seatedTime + X)
             {
                 persons[id].timeWatched = timer - persons[id].seatedTime;
                 printf(RED "t=%lld : %s watched the match for %lld seconds and is leaving\n" RESET, timer, persons[id].name, persons[id].timeWatched);
-                zones[support].current--;       
+                zones[support].current--;
                 break;
             }
 
             if (zones[1].score >= persons[id].enragedScore)
             {
                 printf(RED "t=%lld : %s is leaving due to the bad defensive performance of his team\n" RESET, timer, persons[id].name);
-                zones[support].current--; 
+                zones[support].current--;
                 break;
             }
+            pthread_mutex_unlock(&time_lock[CTIME]);
         }
         semaphore_signal(zoneHs);
     }
@@ -168,11 +178,20 @@ void exiting(int id, int wantedZone)
     {
         while (1)
         {
+            int CTIME = timer + 1;
+
+            pthread_mutex_lock(&time_lock[CTIME]);
+            //printf("id:%d wantedZone:%d sr:%lld\n",id,wantedZone,persons[id].stadiumReached);
+            while (timer != CTIME)
+            {
+                pthread_cond_wait(&timeC[CTIME], &time_lock[CTIME]);
+            }
+
             if (timer >= persons[id].seatedTime + X)
             {
                 persons[id].timeWatched = timer - persons[id].seatedTime;
                 printf(RED "t=%lld : %s watched the match for %lld seconds and is leaving\n" RESET, timer, persons[id].name, persons[id].timeWatched);
-                zones[support].current--;           
+                zones[support].current--;
                 break;
             }
 
@@ -182,6 +201,8 @@ void exiting(int id, int wantedZone)
                 zones[support].current--;
                 break;
             }
+
+            pthread_mutex_unlock(&time_lock[CTIME]);
         }
         semaphore_signal(zoneAs);
     }
@@ -189,6 +210,15 @@ void exiting(int id, int wantedZone)
     {
         while (1)
         {
+            int CTIME = timer + 1;
+
+            pthread_mutex_lock(&time_lock[CTIME]);
+            //printf("id:%d wantedZone:%d sr:%lld\n",id,wantedZone,persons[id].stadiumReached);
+            while (timer != CTIME)
+            {
+                pthread_cond_wait(&timeC[CTIME], &time_lock[CTIME]);
+            }
+
             if (timer >= persons[id].seatedTime + X)
             {
                 persons[id].timeWatched = timer - persons[id].seatedTime;
@@ -196,8 +226,70 @@ void exiting(int id, int wantedZone)
                 zones[support].current--;
                 break;
             }
+            pthread_mutex_unlock(&time_lock[CTIME]);
         }
         semaphore_signal(zoneNs);
     }
 }
 
+// void exiting(int id, int wantedZone)
+// {
+//     ll support = persons[id].support;
+//     ll zoneSeated = persons[id].currentZoneSeated;
+//     if (persons[id].support == 0 && persons[id].currentZoneSeated == wantedZone)
+//     {
+//         while (1)
+//         {
+//             if (timer >= persons[id].seatedTime + X)
+//             {
+//                 persons[id].timeWatched = timer - persons[id].seatedTime;
+//                 printf(RED "t=%lld : %s watched the match for %lld seconds and is leaving\n" RESET, timer, persons[id].name, persons[id].timeWatched);
+//                 zones[support].current--;
+//                 break;
+//             }
+
+//             if (zones[1].score >= persons[id].enragedScore)
+//             {
+//                 printf(RED "t=%lld : %s is leaving due to the bad defensive performance of his team\n" RESET, timer, persons[id].name);
+//                 zones[support].current--;
+//                 break;
+//             }
+//         }
+//         semaphore_signal(zoneHs);
+//     }
+//     if (persons[id].support == 1 && persons[id].currentZoneSeated == wantedZone)
+//     {
+//         while (1)
+//         {
+//             if (timer >= persons[id].seatedTime + X)
+//             {
+//                 persons[id].timeWatched = timer - persons[id].seatedTime;
+//                 printf(RED "t=%lld : %s watched the match for %lld seconds and is leaving\n" RESET, timer, persons[id].name, persons[id].timeWatched);
+//                 zones[support].current--;
+//                 break;
+//             }
+
+//             if (zones[0].score >= persons[id].enragedScore)
+//             {
+//                 printf(RED "t=%lld : %s is leaving due to the bad defensive performance of his team\n" RESET, timer, persons[id].name);
+//                 zones[support].current--;
+//                 break;
+//             }
+//         }
+//         semaphore_signal(zoneAs);
+//     }
+//     if (persons[id].support == 2 && persons[id].currentZoneSeated == wantedZone)
+//     {
+//         while (1)
+//         {
+//             if (timer >= persons[id].seatedTime + X)
+//             {
+//                 persons[id].timeWatched = timer - persons[id].seatedTime;
+//                 printf(RED "t=%lld : %s watched the match for %lld seconds and is leaving\n" RESET, timer, persons[id].name, persons[id].timeWatched);
+//                 zones[support].current--;
+//                 break;
+//             }
+//         }
+//         semaphore_signal(zoneNs);
+//     }
+// }
