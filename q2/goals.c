@@ -1,7 +1,5 @@
 #include "goals.h"
 #include "utils.h"
- 
-
 
 void position_giver(ll id)
 {

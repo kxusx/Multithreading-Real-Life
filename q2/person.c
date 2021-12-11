@@ -1,6 +1,6 @@
 #include "person.h"
 #include "utils.h"
-
+ 
 void *personStimulater(void *arg)
 {
     int id = ((struct thread_details *)arg)->id;
