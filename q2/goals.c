@@ -2,7 +2,7 @@
 #include "utils.h"
 
 void position_giver(ll id)
-{
+{ 
     pthread_mutex_lock(&position_lock[goals[id].zone]);
     zones[goals[id].zone].pos = zones[goals[id].zone].pos+1;
     ll pos = zones[goals[id].zone].pos;
@@ -21,7 +21,7 @@ void position_giver(ll id)
     if (pos >= 4)
     {   
         char str[100], random[100];
-        strcpy(random, "th");
+        strcpy(random, "the");
         sprintf(str, "%lld", pos);
         strcat(str, random);
         strcpy(goals[id].position, str);
